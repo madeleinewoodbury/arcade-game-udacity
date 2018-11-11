@@ -14,6 +14,27 @@ class Enemy {
         // You should multiply any movement by the dt parameter
         // which will ensure the game runs at the same speed for
         // all computers.
+
+        this.x += this.speed * dt;
+        // if x is gerater than the length of the canvas, reset pos to -100
+        if(this.x > 707){
+            this.x = -100;
+            //generate a random number for the speed
+            let randomSpeed = Math.floor(Math.random() * 500);
+            this.speed = 100 + randomSpeed;
+        }
+
+    }
+
+    collision(){
+        let playerMin = player.x - 75;
+        let  playerMax = player.x + 75;
+        if(this.y === player.y){
+            if(this.x > playerMin && this.x < playerMax){
+                player.x = 303;
+                player.y = 400;
+            }
+        }
     }
     
     // Draw the enemy on the screen, required method for game
@@ -34,8 +55,23 @@ class Player{
         this.sprite = 'images/char-boy.png';
     }
 
-    uodate(){
+    update(){
+        // Prevent player from moving off canvas
+        if(this.y > 400){
+            this.y = 400;
+        }
+        if(this.x < 3){
+            this.x = 3;
+        }
+        if(this.x > 603){
+            this.x = 603;
+        }
 
+        // When the player reaches the top of the canvas, reset player positon
+        if(this.y === -50){
+            this.y = 400;
+            this.x = 303;
+        }
     }
 
     // Drwa the player on the screen
@@ -43,16 +79,34 @@ class Player{
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
 
-    handleInput(){
-
+    handleInput(key){
+        if(key === 'left'){
+            this.x -= this.speed + 50;
+        }else if(key === 'up'){ 
+            this.y -= this.speed + 40;
+        }else if(key === 'right'){
+            this.x += this.speed + 50;
+        }else if(key === 'down'){
+            this.y += this.speed + 40;
+        }
     }
+
 }
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-const allEnemies = [];
-const player = new Player();
+const allEnemies = [],
+      player = new Player(303, 400, 50);
+
+let enemy,
+    enemyStartPos = [40, 130, 220];
+
+enemyStartPos.forEach(function(y){
+    let randomSpeed = 100 + (Math.floor(Math.random() * 500));
+    enemy = new Enemy(0, y, randomSpeed);
+    allEnemies.push(enemy);
+});
 
 
 // This listens for key presses and sends the keys to your

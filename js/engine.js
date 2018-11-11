@@ -24,7 +24,7 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
-    canvas.width = 505;
+    canvas.width = 707;
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
@@ -51,7 +51,7 @@ var Engine = (function(global) {
          * for the next time this function is called.
          */
         lastTime = now;
-
+    
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
@@ -79,7 +79,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -93,7 +93,14 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
         player.update();
+    }
+
+    function checkCollisions(){
+        allEnemies.forEach(function(enemy) {
+            enemy.collision();
+        });
     }
 
     /* This function initially draws the "game level", it will then call
@@ -115,7 +122,7 @@ var Engine = (function(global) {
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ],
             numRows = 6,
-            numCols = 5,
+            numCols = 7,
             row, col;
         
         // Before drawing, clear existing canvas
