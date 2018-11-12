@@ -22,11 +22,14 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+        isGameOver = false,
         lastTime;
 
     canvas.width = 707;
     canvas.height = 606;
     doc.body.appendChild(canvas);
+
+    drawGameStats();
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -99,7 +102,10 @@ var Engine = (function(global) {
 
     function checkCollisions(){
         allEnemies.forEach(function(enemy) {
-            enemy.collision();
+            if(enemy.collision()){
+                isGameOver = player.updateLives();
+                updateLivesUl();
+            };
         });
     }
 
@@ -169,6 +175,43 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+    }
+
+    // Dynamically draws game stats content
+    function drawGameStats(){
+        
+        // Create gameStats elements
+        gameStatsDiv = doc.createElement('div'),
+        livesUl = doc.createElement('ul'),
+        pointsDiv = doc.createElement('div'),
+        restartDiv = doc.createElement('div');
+
+        // Set gameStats content and classes
+        livesUl.classList.add('lives');
+        livesUl.innerHTML = `
+            <li><i class="fas fa-heart"></i></li>
+            <li><i class="fas fa-heart"></i></li>
+            <li><i class="fas fa-heart"></i></li>
+        `;
+        pointsDiv.classList.add('points');
+        pointsDiv.innerHTML = 'Points: 0';
+        restartDiv.classList.add('restart');
+        restartDiv.innerHTML = `
+            <span id="playAgainBtn"><i class="fas fa-redo"></i></span>
+        `;
+
+        // Append to gameStatsDiv
+        gameStatsDiv.classList.add('game-stats');
+        gameStatsDiv.appendChild(livesUl);
+        gameStatsDiv.appendChild(pointsDiv);
+        gameStatsDiv.appendChild(restartDiv);
+
+        doc.body.appendChild(gameStatsDiv);
+
+    }
+
+    function updateLivesUl(){
+        livesUl.firstElementChild.classList.add('hide');
     }
 
     /* Go ahead and load all of the images we know we're going to need to

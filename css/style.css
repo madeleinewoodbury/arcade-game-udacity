@@ -1,3 +1,33 @@
 body {
     text-align: center;
 }
+
+
+.game-stats{
+    width: 700px;
+    display: flex;
+    margin: 0 auto;
+}
+
+li{
+    list-style: none;
+    display: inline-block;
+}
+
+.lives{
+    width: 20%;
+    margin-top: 0;
+}
+
+.points{
+    width: 60%;
+    text-align: center;
+}
+
+.restart{
+    width: 20%;
+}
+
+.hide{
+    display: none;
+}

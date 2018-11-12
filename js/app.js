@@ -33,7 +33,15 @@ class Enemy {
             if(this.x > playerMin && this.x < playerMax){
                 player.x = 303;
                 player.y = 400;
+
+                // Player loses one life when collision occurs
+                // player.lives -= 1;
+                // player.updateLives();
+
+                return true;
             }
+        }else{
+            return false;
         }
     }
     
@@ -48,10 +56,11 @@ class Enemy {
 // This class requires an update(), render() and
 // a handleInput() method.
 class Player{
-    constructor(x, y, speed){
+    constructor(x, y, speed, lives){
         this.x = x;
         this.y = y;
         this.speed = speed;
+        this.lives = lives;
         this.sprite = 'images/char-boy.png';
     }
 
@@ -71,6 +80,15 @@ class Player{
         if(this.y === -50){
             this.y = 400;
             this.x = 303;
+        }
+    }
+
+    updateLives(){
+        this.lives -= 1;
+        if(this.lives >= 1){
+            return false;
+        }else{
+            return true;
         }
     }
 
@@ -97,7 +115,7 @@ class Player{
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 const allEnemies = [],
-      player = new Player(303, 400, 50);
+      player = new Player(303, 400, 50, 3);
 
 let enemy,
     enemyStartPos = [40, 130, 220];
@@ -107,6 +125,9 @@ enemyStartPos.forEach(function(y){
     enemy = new Enemy(0, y, randomSpeed);
     allEnemies.push(enemy);
 });
+
+// Lives
+// const lives = document.querySelectorAll('li');
 
 
 // This listens for key presses and sends the keys to your
