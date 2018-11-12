@@ -34,10 +34,6 @@ class Enemy {
                 player.x = 303;
                 player.y = 400;
 
-                // Player loses one life when collision occurs
-                // player.lives -= 1;
-                // player.updateLives();
-
                 return true;
             }
         }else{
@@ -60,7 +56,9 @@ class Player{
         this.x = x;
         this.y = y;
         this.speed = speed;
-        this.lives = lives;
+        this.lives = 3;
+        this.isGameOver = false;
+        this.points = 0;
         this.sprite = 'images/char-boy.png';
     }
 
@@ -83,13 +81,20 @@ class Player{
         }
     }
 
+
     updateLives(){
         this.lives -= 1;
-        if(this.lives >= 1){
-            return false;
+        if(this.lives === 2){
+            document.querySelector('.lives').children[0].classList.add('hide');
+        }else if(this.lives === 1){
+            document.querySelector('.lives').children[1].classList.add('hide');
         }else{
-            return true;
+            document.querySelector('.lives').children[2].classList.add('hide');
+            this.isGameOver = true;
         }
+
+        console.log(`Lives: ${this.lives}, Game Over: ${this.isGameOver}`);
+        return this.isGameOver;
     }
 
     // Drwa the player on the screen
@@ -111,23 +116,57 @@ class Player{
 
 }
 
+class Gem{
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+        this.value = 50;
+        this.sprite = 'images/gem-blue.png';
+    }
+
+    grabGem(){
+        let playerMin = player.x - 75;
+        let  playerMax = player.x + 75;
+        if(this.y === player.y){
+            if(this.x > playerMin && this.x < playerMax){
+                return true;
+            }
+        }else{
+            return false;
+        }
+    };
+
+    // Draw the enemy on the screen, required method for game
+    render() {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    };
+
+}
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 const allEnemies = [],
+      gems = [],
       player = new Player(303, 400, 50, 3);
 
 let enemy,
-    enemyStartPos = [40, 130, 220];
+    gem,
+    yPos = [40, 130, 220, 310];
 
-enemyStartPos.forEach(function(y){
+yPos.forEach(function(y){
     let randomSpeed = 100 + (Math.floor(Math.random() * 500));
     enemy = new Enemy(0, y, randomSpeed);
     allEnemies.push(enemy);
 });
 
-// Lives
-// const lives = document.querySelectorAll('li');
+// Generate 50 gems
+for(let i = 0; i < 50; i++){
+    let gemX = Math.floor(Math.random() * (625-85 + 1) + 85);
+    let gemY = yPos[Math.floor(Math.random() * 4)];
+    gem = new Gem(gemX, gemY);
+    gems.push(gem);
+}
 
 
 // This listens for key presses and sends the keys to your

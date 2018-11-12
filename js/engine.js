@@ -22,7 +22,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        isGameOver = false,
+        gemOnBoard = false,
+        currentGem,
         lastTime;
 
     canvas.width = 707;
@@ -66,7 +67,6 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        reset();
         lastTime = Date.now();
         main();
     }
@@ -83,6 +83,7 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
+
     }
 
     /* This is called by the update function and loops through all of the
@@ -98,13 +99,21 @@ var Engine = (function(global) {
         });
 
         player.update();
+        if(gemOnBoard){
+            if(currentGem.grabGem()){
+                updatePoints();
+            }
+        }
+
+
     }
 
     function checkCollisions(){
         allEnemies.forEach(function(enemy) {
             if(enemy.collision()){
-                isGameOver = player.updateLives();
-                updateLivesUl();
+                if(player.updateLives()){
+                    reset();
+                };
             };
         });
     }
@@ -123,9 +132,9 @@ var Engine = (function(global) {
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
+                'images/stone-block.png',   // Row 3 of 4 of stone
+                'images/stone-block.png',   // Row 4 of 4 of grass
+                'images/grass-block.png'    // Row 1 of 1 of grass
             ],
             numRows = 6,
             numCols = 7,
@@ -167,6 +176,18 @@ var Engine = (function(global) {
         });
 
         player.render();
+        
+        // Render random gem from gems
+        if(!gemOnBoard){
+            currentGem= getRandomGem();
+            gemOnBoard = true;
+        }
+        currentGem.render();
+    }
+
+    function getRandomGem(){
+        let gemToRender = gems[Math.floor(Math.random() * 50)];
+        return gemToRender;
     }
 
     /* This function does nothing but it could have been a good place to
@@ -174,7 +195,8 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        // Reset the game
+        win.location.reload();
     }
 
     // Dynamically draws game stats content
@@ -210,9 +232,16 @@ var Engine = (function(global) {
 
     }
 
-    function updateLivesUl(){
-        livesUl.firstElementChild.classList.add('hide');
+    function updatePoints(){
+        player.points += currentGem.value;
+        gemOnBoard = false;
+        pointsDiv.innerHTML = player.points;
     }
+
+    // Event listener on play again button
+    doc.getElementById('playAgainBtn').addEventListener('click', function(){
+        reset();
+    });
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
@@ -223,7 +252,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/gem-blue.png'
     ]);
     Resources.onReady(init);
 
