@@ -59,7 +59,19 @@ class Player{
         this.lives = 3;
         this.isGameOver = false;
         this.points = 0;
-        this.sprite = 'images/char-boy.png';
+        this.sprite = 0;
+    }
+
+    getCharacters(){
+        const characters = [
+            'images/char-boy.png',
+            'images/char-horn-girl.png',
+            'images/char-pink-girl.png',
+            'images/char-princess-girl.png',
+            'images/char-cat-girl.png'
+        ];
+
+        return characters;
     }
 
     update(){
@@ -82,24 +94,26 @@ class Player{
     }
 
 
-    updateLives(){
-        this.lives -= 1;
-        if(this.lives === 2){
-            document.querySelector('.lives').children[0].classList.add('hide');
-        }else if(this.lives === 1){
-            document.querySelector('.lives').children[1].classList.add('hide');
-        }else{
-            document.querySelector('.lives').children[2].classList.add('hide');
+    updateLives(value){
+        this.lives += value;
+        if(this.lives === 0){
             this.isGameOver = true;
         }
 
         console.log(`Lives: ${this.lives}, Game Over: ${this.isGameOver}`);
-        return this.isGameOver;
+    }
+
+    changeChar(){
+        if(this.sprite !== 4){
+            this.sprite += 1;
+        }else{
+            this.sprite = 0;
+        }
     }
 
     // Drwa the player on the screen
     render(){
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+        ctx.drawImage(Resources.get(this.getCharacters()[this.sprite]), this.x, this.y);
     }
 
     handleInput(key){
@@ -112,16 +126,21 @@ class Player{
         }else if(key === 'down'){
             this.y += this.speed + 40;
         }
+
+        if(this.x === 3 && this.y === 400){
+            this.changeChar();
+        }
+
     }
 
 }
 
 class Gem{
-    constructor(x, y){
+    constructor(x, y, value, sprite){
         this.x = x;
         this.y = y;
-        this.value = 50;
-        this.sprite = 'images/gem-blue.png';
+        this.value = value;
+        this.sprite = sprite;
     }
 
     grabGem(){
@@ -148,11 +167,12 @@ class Gem{
 // Place the player object in a variable called player
 const allEnemies = [],
       gems = [],
-      player = new Player(303, 400, 50, 3);
+      player = new Player(303, 400, 50, 3),
+      yPos = [40, 130, 220, 310],
+      gemSprites = ['gem-blue', 'gem-orange', 'gem-green'];
 
 let enemy,
-    gem,
-    yPos = [40, 130, 220, 310];
+    gem;
 
 yPos.forEach(function(y){
     let randomSpeed = 100 + (Math.floor(Math.random() * 500));
@@ -164,10 +184,19 @@ yPos.forEach(function(y){
 for(let i = 0; i < 50; i++){
     let gemX = Math.floor(Math.random() * (625-85 + 1) + 85);
     let gemY = yPos[Math.floor(Math.random() * 4)];
-    gem = new Gem(gemX, gemY);
+    let gemSprite;
+    let gemValue;
+    // Every 10 gem will be a heart
+    if(i % 10 === 0){
+        gemSprite = 'images/heart.png';
+        gemValue = 0;
+    }else{
+        gemSprite = `images/${gemSprites[Math.floor(Math.random() * 3)]}.png`;
+        gemValue = 50;
+    }
+    gem = new Gem(gemX, gemY, gemValue, gemSprite);
     gems.push(gem);
 }
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

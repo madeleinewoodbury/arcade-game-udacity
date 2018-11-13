@@ -111,9 +111,11 @@ var Engine = (function(global) {
     function checkCollisions(){
         allEnemies.forEach(function(enemy) {
             if(enemy.collision()){
-                if(player.updateLives()){
+                player.updateLives(-1);
+                updateHearts(-1);
+                if(player.isGameOver){
                     reset();
-                };
+                }
             };
         });
     }
@@ -159,6 +161,10 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
+
+        // Render Selector tile
+        ctx.drawImage(Resources.get('images/Selector.png'), 0, 400);
+
 
         renderEntities();
     }
@@ -233,9 +239,26 @@ var Engine = (function(global) {
     }
 
     function updatePoints(){
-        player.points += currentGem.value;
+        // If the value of gem is 0 (heart) player's lives will be updated
+        if(currentGem.value !== 0){
+            player.points += currentGem.value;
+        }else if(player.lives !== 3){
+            player.lives += 1;
+            updateHearts(1);
+            console.log(`Palyer lives: ${player.lives}`);
+        }
         gemOnBoard = false;
         pointsDiv.innerHTML = player.points;
+    }
+
+    function updateHearts(life){
+        if(life === -1){
+            document.querySelector('.lives').children[0].remove();
+        }else{
+            let heart = document.createElement('li');
+            heart.innerHTML = '<i class="fas fa-heart"></i>';
+            livesUl.appendChild(heart);
+        }
     }
 
     // Event listener on play again button
@@ -253,7 +276,15 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
-        'images/gem-blue.png'
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        'images/char-cat-girl.png',
+        'images/gem-blue.png',
+        'images/gem-green.png',
+        'images/gem-orange.png',
+        'images/heart.png',
+        'images/Selector.png'
     ]);
     Resources.onReady(init);
 
