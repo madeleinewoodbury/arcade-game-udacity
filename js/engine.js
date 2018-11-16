@@ -83,7 +83,6 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
-
     }
 
     /* This is called by the update function and loops through all of the
@@ -99,6 +98,7 @@ var Engine = (function(global) {
         });
 
         player.update();
+
         if(gemOnBoard){
             if(currentGem.grabGem()){
                 updatePoints();
@@ -189,6 +189,7 @@ var Engine = (function(global) {
             gemOnBoard = true;
         }
         currentGem.render();
+        goal.render();
     }
 
     function getRandomGem(){
@@ -239,26 +240,33 @@ var Engine = (function(global) {
     }
 
     function updatePoints(){
-        // If the value of gem is 0 (heart) player's lives will be updated
         if(currentGem.value !== 0){
-            player.points += currentGem.value;
+            console.log('The gem value is: ' + currentGem.value);
+            pointsDiv.innerHTML = player.points;
         }else if(player.lives !== 3){
-            player.lives += 1;
+            player.updateLives(1);
             updateHearts(1);
-            console.log(`Palyer lives: ${player.lives}`);
+            console.log('The player now has ' + player.lives + 'lives');
         }
+
         gemOnBoard = false;
-        pointsDiv.innerHTML = player.points;
+        
     }
 
     function updateHearts(life){
+        // const hearts = document.querySelector('.lives');
         if(life === -1){
+            console.log(document.querySelector('.lives').children[0]);
             document.querySelector('.lives').children[0].remove();
         }else{
+            let hearts = document.querySelector('.lives');
+            console.log(hearts);
             let heart = document.createElement('li');
             heart.innerHTML = '<i class="fas fa-heart"></i>';
-            livesUl.appendChild(heart);
+            console.log(heart);
+            hearts.appendChild(heart);
         }
+
     }
 
     // Event listener on play again button
@@ -284,7 +292,8 @@ var Engine = (function(global) {
         'images/gem-green.png',
         'images/gem-orange.png',
         'images/heart.png',
-        'images/Selector.png'
+        'images/Selector.png',
+        'images/Star.png'
     ]);
     Resources.onReady(init);
 

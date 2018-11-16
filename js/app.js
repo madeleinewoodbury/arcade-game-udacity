@@ -85,22 +85,28 @@ class Player{
         if(this.x > 603){
             this.x = 603;
         }
+        if(this.y < -50){
+            this.y = -50;
+        }
 
         // When the player reaches the top of the canvas, reset player positon
         if(this.y === -50){
-            this.y = 400;
-            this.x = 303;
+            if(this.x === goal.x){
+                this.goalReached();
+            }
         }
+
     }
 
+    updatePoints(val){
+        this.points += val;
+    }
 
-    updateLives(value){
-        this.lives += value;
+    updateLives(val){
+        this.lives += val;
         if(this.lives === 0){
             this.isGameOver = true;
         }
-
-        console.log(`Lives: ${this.lives}, Game Over: ${this.isGameOver}`);
     }
 
     changeChar(){
@@ -109,6 +115,16 @@ class Player{
         }else{
             this.sprite = 0;
         }
+    }
+
+    goalReached(){
+        this.points += 100;
+        let pointsDisplay = document.querySelector('.points');
+        pointsDisplay.classList.add('goal');
+        goal.x = goal.getStarXPos();
+        this.x = 303;
+        this.y = 400;
+        // pointsDisplay.classList.remove('goal');
     }
 
     // Drwa the player on the screen
@@ -130,7 +146,6 @@ class Player{
         if(this.x === 3 && this.y === 400){
             this.changeChar();
         }
-
     }
 
 }
@@ -148,6 +163,9 @@ class Gem{
         let  playerMax = player.x + 75;
         if(this.y === player.y){
             if(this.x > playerMin && this.x < playerMax){
+                if(this.value !== 0){
+                    player.updatePoints(this.value);
+                }
                 return true;
             }
         }else{
@@ -155,11 +173,28 @@ class Gem{
         }
     };
 
-    // Draw the enemy on the screen, required method for game
     render() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     };
 
+}
+
+class Goal{
+    constructor() {
+        this.x = this.getStarXPos();
+        this.y = -12;
+        this.sprite = 'images/Star.png';
+    }
+
+    getStarXPos(){
+        const xPos = [3, 103, 203, 303, 403, 503, 603];
+        
+        return xPos[Math.floor(Math.random() * 7)];
+    }
+
+    render() {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    };
 }
 
 // Now instantiate your objects.
@@ -169,6 +204,7 @@ const allEnemies = [],
       gems = [],
       player = new Player(303, 400, 50, 3),
       yPos = [40, 130, 220, 310],
+      goal = new Goal(),
       gemSprites = ['gem-blue', 'gem-orange', 'gem-green'];
 
 let enemy,
