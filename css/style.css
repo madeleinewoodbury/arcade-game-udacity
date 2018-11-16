@@ -39,13 +39,3 @@ li{
 #playAgainBtn{
     cursor: pointer;
 }
-
-.goal{
-    animation-name: goal;
-    animation-duration: 2s; 
-}
-
-@keyframes goal{
-    0% {color: black; font-weight: 1em;}
-    100% {color: gold; font-size: 1.5em;}
-}

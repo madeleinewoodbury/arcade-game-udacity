@@ -81,8 +81,8 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        checkCollisions();
+            updateEntities(dt);
+            checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -241,12 +241,10 @@ var Engine = (function(global) {
 
     function updatePoints(){
         if(currentGem.value !== 0){
-            console.log('The gem value is: ' + currentGem.value);
             pointsDiv.innerHTML = player.points;
         }else if(player.lives !== 3){
             player.updateLives(1);
             updateHearts(1);
-            console.log('The player now has ' + player.lives + 'lives');
         }
 
         gemOnBoard = false;
@@ -254,19 +252,14 @@ var Engine = (function(global) {
     }
 
     function updateHearts(life){
-        // const hearts = document.querySelector('.lives');
         if(life === -1){
-            console.log(document.querySelector('.lives').children[0]);
             document.querySelector('.lives').children[0].remove();
         }else{
             let hearts = document.querySelector('.lives');
-            console.log(hearts);
             let heart = document.createElement('li');
             heart.innerHTML = '<i class="fas fa-heart"></i>';
-            console.log(heart);
             hearts.appendChild(heart);
         }
-
     }
 
     // Event listener on play again button

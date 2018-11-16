@@ -52,7 +52,7 @@ class Enemy {
 // This class requires an update(), render() and
 // a handleInput() method.
 class Player{
-    constructor(x, y, speed, lives){
+    constructor(x, y, speed){
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -118,13 +118,9 @@ class Player{
     }
 
     goalReached(){
-        this.points += 100;
-        let pointsDisplay = document.querySelector('.points');
-        pointsDisplay.classList.add('goal');
         goal.x = goal.getStarXPos();
         this.x = 303;
         this.y = 400;
-        // pointsDisplay.classList.remove('goal');
     }
 
     // Drwa the player on the screen
@@ -146,6 +142,7 @@ class Player{
         if(this.x === 3 && this.y === 400){
             this.changeChar();
         }
+
     }
 
 }
@@ -159,15 +156,12 @@ class Gem{
     }
 
     grabGem(){
-        let playerMin = player.x - 75;
-        let  playerMax = player.x + 75;
-        if(this.y === player.y){
-            if(this.x > playerMin && this.x < playerMax){
-                if(this.value !== 0){
-                    player.updatePoints(this.value);
-                }
-                return true;
+
+        if(this.y === player.y && this.x === player.x){
+            if(this.value !== 0){
+                player.updatePoints(this.value);
             }
+            return true;
         }else{
             return false;
         }
@@ -204,6 +198,7 @@ const allEnemies = [],
       gems = [],
       player = new Player(303, 400, 50, 3),
       yPos = [40, 130, 220, 310],
+      xPos = [3, 103, 203, 303, 403, 503, 603],
       goal = new Goal(),
       gemSprites = ['gem-blue', 'gem-orange', 'gem-green'];
 
@@ -218,7 +213,7 @@ yPos.forEach(function(y){
 
 // Generate 50 gems
 for(let i = 0; i < 50; i++){
-    let gemX = Math.floor(Math.random() * (625-85 + 1) + 85);
+    let gemX = xPos[Math.floor(Math.random() * 7)];
     let gemY = yPos[Math.floor(Math.random() * 4)];
     let gemSprite;
     let gemValue;
