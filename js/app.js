@@ -60,6 +60,7 @@ class Player{
         this.isGameOver = false;
         this.points = 0;
         this.sprite = 0;
+        this.hasWon = false;
     }
 
     getCharacters(){
@@ -123,6 +124,7 @@ class Player{
         goal.x = goal.getStarXPos();
         this.x = 303;
         this.y = 400;
+        this.hasWon = true;
     }
 
     // Drwa the player on the screen
