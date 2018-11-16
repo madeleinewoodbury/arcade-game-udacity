@@ -24,6 +24,8 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         gemOnBoard = false,
         currentGem,
+        seconds = 60,
+        timeInterval = setInterval(timer, 1000),
         lastTime;
 
     canvas.width = 707;
@@ -81,8 +83,12 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
+        if(!player.isGameOver){
             updateEntities(dt);
             checkCollisions();
+        }else{
+            reset();
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -113,9 +119,6 @@ var Engine = (function(global) {
             if(enemy.collision()){
                 player.updateLives(-1);
                 updateHearts(-1);
-                if(player.isGameOver){
-                    reset();
-                }
             };
         });
     }
@@ -237,6 +240,16 @@ var Engine = (function(global) {
 
         doc.body.appendChild(gameStatsDiv);
 
+    }
+
+    function timer(){
+        seconds--;
+        const timeDisplay = document.getElementById('timeDisplay');
+        timeDisplay.innerHTML = seconds;
+        if(seconds === 0){
+            clearInterval(timeInterval);
+            player.isGameOver = true;
+        }
     }
 
     function updatePoints(){

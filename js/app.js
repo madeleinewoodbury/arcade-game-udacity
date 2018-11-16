@@ -91,7 +91,9 @@ class Player{
 
         // When the player reaches the top of the canvas, reset player positon
         if(this.y === -50){
-            if(this.x === goal.x){
+            if(this.x !== goal.x){
+                this.isGameOver = true;
+            }else{
                 this.goalReached();
             }
         }
