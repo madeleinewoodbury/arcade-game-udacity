@@ -3,7 +3,7 @@ Classic-Arcade-Game-Clone
 This is a classic frogger-like arcade game where the goal is for the player to collect as many gems as possible and reach the star at the top before the timer runs out. 
 
 ## Usage
-* [Download zip](https://github.com/madeleinewoodbury/arcade-game-udacity.git)
+* [Download zip](https://github.com/madeleinewoodbury/arcade-game-udacity/archive/master.zip)
 * Extract zip file
 * Open the index.html in your browser 
 
