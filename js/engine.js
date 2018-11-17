@@ -25,6 +25,7 @@ var Engine = (function(global) {
         gemOnBoard = false,
         currentGem,
         seconds = 60,
+        minutes = 1,
         timeInterval = setInterval(timer, 1000),
         lastTime,
         isModalVisible = false;
@@ -33,10 +34,27 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    document.getElementById('minutes').innerHTML = minutes + 1;
+    document.getElementById('seconds').innerHTML = '00';
+
     // Modal variables and event listeners
     const modal = document.getElementById('myModal');
     // Get the <span> element that closes the modal
-    const span = document.querySelector('.close');
+    const closeBtn = document.querySelector('.close');
+
+    // When the user clicks on <span> (x), close the modal
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+        reset();
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            reset();
+        }
+    }
 
     drawGameStats();
 
@@ -91,19 +109,7 @@ var Engine = (function(global) {
     function update(dt) {
         if(!player.isGameOver){
             if(player.hasWon && !isModalVisible ){
-                showModal('Congratulations!!! You won the game!');
-            }else if(isModalVisible){
-                // When the user clicks on <span> (x), close the modal
-                span.onclick = function() {
-                    modal.style.display = "none";
-                }
-
-                // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function(event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none";
-                    }
-                }
+                showModal();
             }else{
                 updateEntities(dt);
                 checkCollisions();
@@ -266,12 +272,23 @@ var Engine = (function(global) {
 
     function timer(){
         seconds--;
-        const timeDisplay = document.getElementById('timeDisplay');
-        timeDisplay.innerHTML = seconds;
-        if(seconds === 0){
+        if(seconds === -1 && minutes !== 0){
+            minutes--;
+            seconds = 59;
+        }
+            document.getElementById('minutes').innerHTML = minutes;
+        if(seconds < 10){
+            document.getElementById('seconds').innerHTML = '0' +seconds;
+
+        }else{
+            document.getElementById('seconds').innerHTML = seconds;
+
+        }
+        if(minutes === 0 && seconds === 0){
             clearInterval(timeInterval);
             player.isGameOver = true;
         }
+
     }
 
     function updatePoints(){
@@ -297,10 +314,16 @@ var Engine = (function(global) {
         }
     }
 
-    function showModal(message){
+    function showModal(){
         clearInterval(timeInterval);
-        const modalMessage = `Congratulations!!! You completed the game in ${60 - seconds} seconds.`
-        document.getElementById('modalMessage').innerHTML = modalMessage;
+        let message = '';
+        if(player.hasWon){
+            message = `
+                <p>Congratulations!!!</p> 
+                <p>You completed the game before the time ran out!</p>
+                <p>Total points: ${player.points}`;
+        }
+        document.getElementById('modalMessage').innerHTML = message;
         // When the user clicks the button, open the modal 
         modal.style.display = "block";
         isModalVisible = true;
