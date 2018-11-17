@@ -1,5 +1,26 @@
 body {
     text-align: center;
+    background: #ECE9E6;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    font-family: 'VT323', monospace;
+    font-size: 18pt;
+}
+
+header{
+    position: absolute;
+    width: 100%;
+    top: 3%;
+    left: 0;
+}
+
+h1{
+    margin: 0;
+    font-family: 'VT323', monospace;
+}
+
+canvas{
+    margin-top: 8%;
 }
 
 .hide{
@@ -10,6 +31,7 @@ body {
     width: 700px;
     display: flex;
     margin: 0 auto;
+    padding-top: 20px;
 }
 
 li{
@@ -34,6 +56,10 @@ li{
 
 .hide{
     display: none;
+}
+
+.fa-heart{
+    color: rgb(211, 24, 24);
 }
 
 #playAgainBtn{

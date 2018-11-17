@@ -31,7 +31,7 @@ var Engine = (function(global) {
         isModalVisible = false;
 
     canvas.width = 707;
-    canvas.height = 606;
+    canvas.height = 650; 
     doc.body.appendChild(canvas);
 
     document.getElementById('minutes').innerHTML = minutes + 1;
@@ -45,14 +45,24 @@ var Engine = (function(global) {
     // When the user clicks on <span> (x), close the modal
     closeBtn.onclick = function() {
         modal.style.display = "none";
-        reset();
+        isModalVisible = false;
+        if(player.isGameOver || player.hasWon){
+            reset();
+        }else{
+            player.needsInfo = false;
+        }
     }
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
-            reset();
+            isModalVisible = false;
+            if(player.isGameOver || player.hasWon){
+                reset();
+            }else{
+                player.needsInfo = false;
+            }
         }
     }
 
@@ -108,14 +118,22 @@ var Engine = (function(global) {
      */
     function update(dt) {
         if(!player.isGameOver){
-            if(player.hasWon && !isModalVisible ){
+            if(isModalVisible){
+                if(!player.needsInfo && !player.hasWon){
+                    modal.style.display = "none";
+                    isModalVisible = false;
+                }
+            }else if(player.hasWon){
                 showModal();
-            }else{
+            }else if(player.needsInfo){
+                showInfoModal();
+            }
+            else{
                 updateEntities(dt);
                 checkCollisions();
             }
         }else{
-            reset();
+            showModal();
         }
     }
 
@@ -167,9 +185,10 @@ var Engine = (function(global) {
                 'images/stone-block.png',   // Row 2 of 3 of stone
                 'images/stone-block.png',   // Row 3 of 4 of stone
                 'images/stone-block.png',   // Row 4 of 4 of grass
-                'images/grass-block.png'    // Row 1 of 1 of grass
+                'images/grass-block.png',    // Row 1 of 2 of grass
+                'images/grass-block.png'    // Row 2 of 2 of grass
             ],
-            numRows = 6,
+            numRows = 7,
             numCols = 7,
             row, col;
         
@@ -193,8 +212,9 @@ var Engine = (function(global) {
             }
         }
 
-        // Render Selector tile
-        ctx.drawImage(Resources.get('images/Selector.png'), 0, 400);
+        // Render Selector and question-mark tile
+        ctx.drawImage(Resources.get('images/Selector.png'), 0, 480);
+        ctx.drawImage(Resources.get('images/question-mark.png'), 620, 550);
 
 
         renderEntities();
@@ -322,9 +342,26 @@ var Engine = (function(global) {
                 <p>Congratulations!!!</p> 
                 <p>You completed the game before the time ran out!</p>
                 <p>Total points: ${player.points}`;
+        }else{
+            message = `
+            <p>GAME OVER</p> 
+            <p>Sorry, you lost :-(</p>`;
         }
+
+
         document.getElementById('modalMessage').innerHTML = message;
-        // When the user clicks the button, open the modal 
+
+        modal.style.display = "block";
+        isModalVisible = true;
+    }
+
+    function showInfoModal(){
+        let message = `
+        <p>GAME INSTRUCTIONS</p> 
+        <p>Game instructions will be displayed here</p>`;
+
+        document.getElementById('modalMessage').innerHTML = message;
+
         modal.style.display = "block";
         isModalVisible = true;
     }
@@ -354,7 +391,8 @@ var Engine = (function(global) {
         'images/gem-orange.png',
         'images/heart.png',
         'images/Selector.png',
-        'images/Star.png'
+        'images/Star.png',
+        'images/question-mark.png'
     ]);
     Resources.onReady(init);
 

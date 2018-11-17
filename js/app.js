@@ -32,13 +32,19 @@ class Enemy {
         if(this.y === player.y){
             if(this.x > playerMin && this.x < playerMax){
                 player.x = 303;
-                player.y = 400;
+                player.y = 490;
 
                 return true;
             }
-        }else{
-            return false;
+        }else if(player.y === -50){
+            if(player.x !== goal.x){
+                player.x = 303;
+                player.y = 490;
+                goal.x = goal.getStarXPos();
+                return true;
+            }
         }
+            return false;
     }
     
     // Draw the enemy on the screen, required method for game
@@ -61,6 +67,7 @@ class Player{
         this.points = 0;
         this.sprite = 0;
         this.hasWon = false;
+        this.needsInfo = false;
     }
 
     getCharacters(){
@@ -77,8 +84,8 @@ class Player{
 
     update(){
         // Prevent player from moving off canvas
-        if(this.y > 400){
-            this.y = 400;
+        if(this.y > 490){
+            this.y = 490;
         }
         if(this.x < 3){
             this.x = 3;
@@ -91,13 +98,9 @@ class Player{
         }
 
         // When the player reaches the top of the canvas, reset player positon
-        if(this.y === -50){
-            if(this.x !== goal.x){
-                this.isGameOver = true;
-            }else{
+        if(this.y === -50 && this.x === goal.x){
                 this.goalReached();
             }
-        }
 
     }
 
@@ -123,7 +126,7 @@ class Player{
     goalReached(){
         goal.x = goal.getStarXPos();
         this.x = 303;
-        this.y = 400;
+        this.y = 490;
         this.hasWon = true;
     }
 
@@ -133,20 +136,28 @@ class Player{
     }
 
     handleInput(key){
-        if(key === 'left'){
-            this.x -= this.speed + 50;
-        }else if(key === 'up'){ 
-            this.y -= this.speed + 40;
-        }else if(key === 'right'){
-            this.x += this.speed + 50;
-        }else if(key === 'down'){
-            this.y += this.speed + 40;
+        if(this.hasWon || this.isGameOver){
+            this.x = 303;
+            this.y = 490;
+        }else{
+            if(key === 'left'){
+                this.x -= this.speed + 50;
+            }else if(key === 'up'){ 
+                this.y -= this.speed + 40;
+            }else if(key === 'right'){
+                this.x += this.speed + 50;
+            }else if(key === 'down'){
+                this.y += this.speed + 40;
+            }
+    
+            if(this.x === 3 && this.y === 490){
+                this.changeChar();
+            }else if(this.x === 603 && this.y === 490){
+                this.needsInfo = true;
+            }else{
+                this.needsInfo = false;
+            }
         }
-
-        if(this.x === 3 && this.y === 400){
-            this.changeChar();
-        }
-
     }
 
 }
@@ -200,7 +211,7 @@ class Goal{
 // Place the player object in a variable called player
 const allEnemies = [],
       gems = [],
-      player = new Player(303, 400, 50, 3),
+      player = new Player(303, 490, 50, 3),
       yPos = [40, 130, 220, 310],
       xPos = [3, 103, 203, 303, 403, 503, 603],
       goal = new Goal(),
