@@ -36,8 +36,21 @@ const Engine = (function(global) {
         secondsDisplay = doc.getElementById('seconds');
 
     // set the canvas elements height/width and add it to the DOM.
-    canvas.width = 707;
-    canvas.height = 650; 
+    // the window innerWidth and innerHeight will determine the canvas size
+    if(win.innerWidth > 730){
+        canvas.width = 707;
+    }else{
+        canvas.width = 404;
+    }
+
+    if(win.innerHeight > 760){
+        canvas.height = 650; 
+    }else if(win.innerHeight > 600){
+        canvas.height = 550; 
+    }else{
+        canvas.height = 460;
+    }
+
     doc.body.appendChild(canvas);
 
     // set the timer to display minutes and seconds (1:30)
@@ -185,7 +198,7 @@ const Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
-        var rowImages = [
+        let rowImages = [
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
@@ -194,9 +207,36 @@ const Engine = (function(global) {
                 'images/grass-block.png',    // Row 1 of 2 of grass
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ],
-            numRows = 7,
+            numRows =7,
             numCols = 7,
-            row, col;
+            row, col,
+            selectorY = 480,
+            infoX = 620,
+            infoY = 550;
+        
+            // Change the variables based on the  canvas with and height
+            if(canvas.width !== 707){
+                numCols = 4;
+                infoX = 318;
+            }
+
+            if(canvas.height !== 650){
+                if(canvas.height === 550){
+                    numRows = 6;
+                    // remove a stone block from rowImages array
+                    rowImages.splice(1,1);
+                    selectorY = 378;
+                    infoY = 455;
+                }else{
+                    numRows = 5;
+                    // remove a stone block from rowImages array
+                    rowImages.splice(1,1);
+                    // remove a grass block from rowImages array
+                    rowImages.pop();
+                    selectorY = 290;
+                    infoY = 368;
+                }
+            }
         
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height)
@@ -219,8 +259,9 @@ const Engine = (function(global) {
         }
 
         // Render Selector and question-mark tile
-        ctx.drawImage(Resources.get('images/Selector.png'), 0, 480);
-        ctx.drawImage(Resources.get('images/question-mark.png'), 620, 550);
+        ctx.drawImage(Resources.get('images/question-mark.png'), infoX, infoY);
+        ctx.drawImage(Resources.get('images/Selector.png'), 0, selectorY);
+
 
         renderEntities();
     }
@@ -333,7 +374,7 @@ const Engine = (function(global) {
     // This function updates the player's points and displayes them in the gameStats
     function updatePoints(){
         if(currentGem.value !== 0){
-            doc.querySelector('.points').innerHTML = player.points;
+            doc.querySelector('.points').innerHTML = 'Points: ' + player.points;
         }else if(player.lives !== 3){
             // if the player has less than 3 lives, updated lives
             player.updateLives(1);

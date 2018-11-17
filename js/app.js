@@ -14,10 +14,10 @@ class Enemy {
 
         this.x += this.speed * dt;
         // if x is gerater than the length of the canvas, reset pos to -100
-        if(this.x > 707){
+        if(this.x > canvasWidth){
             this.x = -100;
             //generate a random number for the speed
-            let randomSpeed = Math.floor(Math.random() * 500);
+            let randomSpeed = Math.floor(Math.random() * topEnemySpeed);
             this.speed = 100 + randomSpeed;
         }
     }
@@ -29,8 +29,8 @@ class Enemy {
         if(this.y === player.y){
             if(this.x > playerMin && this.x < playerMax){
                 // if a collison occurs, reset the player to starting position
-                player.x = 303;
-                player.y = 490;
+                player.x = startX;
+                player.y = startY;
 
                 // the player will loose a life
                 return true;
@@ -38,8 +38,8 @@ class Enemy {
         }else if(player.y === -50){
             // if the player is in the water
             if(player.x !== goal.x){
-                player.x = 303;
-                player.y = 490;
+                player.x = startX;
+                player.y = startY;
                 goal.x = goal.getStarXPos();
 
                 // the player will loose a life
@@ -89,14 +89,14 @@ class Player{
     // update the player's movement
     update(){
         // Prevent player from moving off canvas
-        if(this.y > 490){
-            this.y = 490;
+        if(this.y > startY){
+            this.y = startY;
         }
         if(this.x < 3){
             this.x = 3;
         }
-        if(this.x > 603){
-            this.x = 603;
+        if(this.x > xPos[xPos.length - 1]){
+            this.x = xPos[xPos.length - 1];
         }
         if(this.y < -50){
             this.y = -50;
@@ -133,8 +133,8 @@ class Player{
 
     // The player wins ny reaching the star
     goalReached(){
-        this.x = 303;
-        this.y = 490;
+        this.x = startX;
+        this.y = startY;
         this.hasWon = true;
     }
 
@@ -148,8 +148,8 @@ class Player{
 
         if(this.hasWon || this.isGameOver){
             // prevent the player from moving if the game is won or if game over
-            this.x = 303;
-            this.y = 490;
+            this.x = startX;
+            this.y = startY;
         }else{
             if(key === 'left'){
                 this.x -= this.speed + 50;
@@ -161,10 +161,10 @@ class Player{
                 this.y += this.speed + 40;
             }
 
-            if(this.x === 3 && this.y === 490){
+            if(this.x === 3 && this.y === startY){
                 // if the player is in the selector box, change character index
                 this.changeChar();
-            }else if(this.x === 603 && this.y === 490){
+            }else if(this.x === xPos[xPos.length - 1] && this.y === startY){
                 // if the player is on the question mark, set needsInfo to true to show
                 // game instructions modal
                 this.needsInfo = true;
@@ -172,6 +172,8 @@ class Player{
                 // reset the needsInfo boolean when player steps off the question mark
                 this.needsInfo = false;
             }
+
+            console.log(this.y, this.x);
         }
     }
 
@@ -215,8 +217,7 @@ class Goal{
 
     // set a new star position at the beginning of a new game
     getStarXPos(){
-        const xPos = [3, 103, 203, 303, 403, 503, 603];
-        return xPos[Math.floor(Math.random() * 7)];
+        return xPos[Math.floor(Math.random() * xPos.length)];
     }
 
     render() {
@@ -224,31 +225,59 @@ class Goal{
     };
 }
 
+// Game variables
+let canvasWidth,
+    canvasHeight,
+    startX,
+    yPos = [40, 130, 220, 310],    
+    xPos = [3, 103, 203, 303, 403, 503, 603],    
+    topEnemySpeed,
+    gemSprites = ['gem-blue', 'gem-orange', 'gem-green'],
+    enemy,
+    gem;
+
+// Set game variables based on window height and width
+if(window.innerWidth > 730){
+    canvasWidth = 707;
+    startX = 303;
+    topEnemySpeed = 500;
+}else{
+    canvasWidth = 404;
+    startX = 103;
+    xPos.splice(4,3)
+    topEnemySpeed = 200;
+}
+
+if(window.innerHeight > 760){
+    canvasHeight = 650;
+    startY = 490;
+}else if(window.innerHeight > 600){
+    canvasHeight = 550;
+    yPos.pop();
+    startY = 400;
+}else{
+    canvasHeight = 460;
+    yPos.pop();
+    startY = 310;
+}
+
 // Instantiate the objects.
 const allEnemies = [],
       gems = [],
-      player = new Player(303, 490, 50, 3),
+      player = new Player(startX, startY, 50, 3),
       goal = new Goal();
-
-// Game variables
-const yPos = [40, 130, 220, 310],
-      xPos = [3, 103, 203, 303, 403, 503, 603],
-      gemSprites = ['gem-blue', 'gem-orange', 'gem-green'];
-
-let enemy,
-    gem;
 
 // Instantiate a new enemy for each yPos
 yPos.forEach(function(y){
-    let randomSpeed = 100 + (Math.floor(Math.random() * 500));
+    let randomSpeed = 100 + (Math.floor(Math.random() * topEnemySpeed));
     enemy = new Enemy(0, y, randomSpeed);
     allEnemies.push(enemy);
 });
 
 // Generate 50 gems
 for(let i = 0; i < 50; i++){
-    let gemX = xPos[Math.floor(Math.random() * 7)];
-    let gemY = yPos[Math.floor(Math.random() * 4)];
+    let gemX = xPos[Math.floor(Math.random() * xPos.length)];
+    let gemY = yPos[Math.floor(Math.random() * yPos.length)];
     let gemSprite;
     let gemValue;
 
