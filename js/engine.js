@@ -1,48 +1,50 @@
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
- * render methods on your player and enemy objects (defined in your app.js).
+ * render methods on the player and enemy objects (defined in app.js).
  *
- * A game engine works by drawing the entire game screen over and over, kind of
- * like a flipbook you may have created as a kid. When your player moves across
- * the screen, it may look like just that image/character is moving or being
- * drawn but that is not the case. What's really happening is the entire "scene"
- * is being drawn over and over, presenting the illusion of animation.
+ * A game engine works by drawing the entire game screen over and over.
+ * When your player moves across the screen, it may look like just that 
+ * image/character is moving or being drawn but that is not the case. 
+ * What's really happening is the entire "scene" is being drawn over and over, 
+ * presenting the illusion of animation.
  *
  * This engine makes the canvas' context (ctx) object globally available to make 
  * writing app.js a little simpler to work with.
  */
 
-var Engine = (function(global) {
-    /* Predefine the variables we'll be using within this scope,
+const Engine = (function(global) {
+    /* Predefine the variables within this scope,
      * create the canvas element, grab the 2D context for that canvas
-     * set the canvas elements height/width and add it to the DOM.
      */
-    var doc = global.document,
+    const doc = global.document,
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        gemOnBoard = false,
-        currentGem,
-        seconds = 60,
-        minutes = 1,
-        timeInterval = setInterval(timer, 1000),
-        lastTime,
-        isModalVisible = false;
+        modal = doc.getElementById('myModal'), 
+        closeBtn = doc.querySelector('.close'), // the span el that closes the modal
+        timeInterval = setInterval(timer, 1000);
 
+    let gemOnBoard = false, // when set to true a new gem will be rendered
+        currentGem, // current gem object on the board
+        seconds = 30,
+        minutes = 1,
+        timeIsPaused = false,
+        isModalVisible = false,
+        lastTime,
+        minutesDisplay = doc.getElementById('minutes'),
+        secondsDisplay = doc.getElementById('seconds');
+
+    // set the canvas elements height/width and add it to the DOM.
     canvas.width = 707;
     canvas.height = 650; 
     doc.body.appendChild(canvas);
 
-    document.getElementById('minutes').innerHTML = minutes + 1;
-    document.getElementById('seconds').innerHTML = '00';
+    // set the timer to display minutes and seconds (1:30)
+    minutesDisplay.innerHTML = minutes;
+    secondsDisplay.innerHTML = seconds;
 
-    // Modal variables and event listeners
-    const modal = document.getElementById('myModal');
-    // Get the <span> element that closes the modal
-    const closeBtn = document.querySelector('.close');
-
-    // When the user clicks on <span> (x), close the modal
+    // Event listeners on the modal
     closeBtn.onclick = function() {
         modal.style.display = "none";
         isModalVisible = false;
@@ -50,6 +52,8 @@ var Engine = (function(global) {
             reset();
         }else{
             player.needsInfo = false;
+            // Resume timer
+            timeIsPaused = false;
         }
     }
 
@@ -62,32 +66,33 @@ var Engine = (function(global) {
                 reset();
             }else{
                 player.needsInfo = false;
+                // Resume timer
+                timeIsPaused = false;
             }
         }
     }
 
+    // This method draw the game stats beneath the canvas
     drawGameStats();
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
     function main() {
-        /* Get our time delta information which is required if your game
-         * requires smooth animation. Because everyone's computer processes
-         * instructions at different speeds we need a constant value that
-         * would be the same for everyone (regardless of how fast their
-         * computer is) - hurray time!
+        /* Get our time delta information which is required for smooth animation. 
+         * Because everyone's computer processes instructions at different speeds 
+         * we need a constant value that would be the same for everyone.
          */
-        var now = Date.now(),
+        let now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        /* Call our update/render functions, pass along the time delta to
-         * our update function since it may be used for smooth animation.
+        /* Call the update/render functions, pass along the time delta to
+         * the update function since it may be used for smooth animation.
          */
         update(dt);
         render();
 
-        /* Set our lastTime variable which is used to determine the time delta
+        /* Set the lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
         lastTime = now;
@@ -107,42 +112,44 @@ var Engine = (function(global) {
         main();
     }
 
-    /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. Based on how
-     * you implement your collision detection (when two entities occupy the
-     * same space, for instance when your character should die), you may find
-     * the need to add an additional function call here. For now, we've left
-     * it commented out - you may or may not want to implement this
-     * functionality this way (you could just implement collision detection
-     * on the entities themselves within your app.js file).
+    /* This function is called by main (the game loop) and itself calls all
+     * of the functions which may need to update entity's data. 
      */
     function update(dt) {
         if(!player.isGameOver){
+            // If the player is not game over, check to see if modal is visible
             if(isModalVisible){
+                // If the modal is visible, check if player hasWon or needsInfo
                 if(!player.needsInfo && !player.hasWon){
+                    // hide modal
                     modal.style.display = "none";
                     isModalVisible = false;
+                    // Resume timer
+                    timeIsPaused = false;                    
                 }
             }else if(player.hasWon){
+                // show modal if the player has won the game
                 showModal();
             }else if(player.needsInfo){
+                // show game instructions (this method will pause the game)
                 showInfoModal();
             }
             else{
+                // update the enities data
                 updateEntities(dt);
                 checkCollisions();
             }
         }else{
+            // The player is game over, show modal
             showModal();
         }
     }
 
     /* This is called by the update function and loops through all of the
-     * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
+     * objects within the allEnemies array as defined in app.js and calls
+     * their update() methods. It will then call the update function for the
      * player object. These update methods should focus purely on updating
-     * the data/properties related to the object. Do your drawing in your
-     * render methods.
+     * the data/properties related to the object. 
      */
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
@@ -151,18 +158,19 @@ var Engine = (function(global) {
 
         player.update();
 
+        // check if player grabs a gem
         if(gemOnBoard){
             if(currentGem.grabGem()){
                 updatePoints();
             }
         }
 
-
     }
 
     function checkCollisions(){
         allEnemies.forEach(function(enemy) {
             if(enemy.collision()){
+                // when collision occurs, update lives and hearts displayed
                 player.updateLives(-1);
                 updateHearts(-1);
             };
@@ -170,10 +178,8 @@ var Engine = (function(global) {
     }
 
     /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
-     * game tick (or loop of the game engine) because that's how games work -
-     * they are flipbooks creating the illusion of animation but in reality
-     * they are just drawing the entire screen over and over.
+     * the renderEntities function. This function is called every
+     * game tick (or loop of the game engine).
      */
     function render() {
         /* This array holds the relative URL to the image used
@@ -195,7 +201,7 @@ var Engine = (function(global) {
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height)
 
-        /* Loop through the number of rows and columns we've defined above
+        /* Loop through the number of rows and columns defined above
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
@@ -216,17 +222,16 @@ var Engine = (function(global) {
         ctx.drawImage(Resources.get('images/Selector.png'), 0, 480);
         ctx.drawImage(Resources.get('images/question-mark.png'), 620, 550);
 
-
         renderEntities();
     }
 
     /* This function is called by the render function and is called on each game
-     * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
+     * tick. Its purpose is to then call the render functions defined
+     * on the enemy and player entities within app.js
      */
     function renderEntities() {
         /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
+         * the render function
          */
         allEnemies.forEach(function(enemy) {
             enemy.render();
@@ -234,26 +239,32 @@ var Engine = (function(global) {
 
         player.render();
         
-        // Render random gem from gems
+        // Render a new random gem if there is no current gem on the  boards
         if(!gemOnBoard){
             currentGem= getRandomGem();
             gemOnBoard = true;
         }
+
+        // Render current gem and goal(star)
         currentGem.render();
         goal.render();
     }
 
+    // This function genereates a new random gem object
     function getRandomGem(){
         let gemToRender = gems[Math.floor(Math.random() * 50)];
+
+        // Prevent hearts on the board while the player has three lives
+        if(player.lives === 3 && gemToRender.value === 0){
+            while(gemToRender.value === 0){
+                gemToRender = gems[Math.floor(Math.random() * 50)];
+            }
+        }
         return gemToRender;
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
+    // This function resets the game by reloading the window element
     function reset() {
-        // Reset the game
         win.location.reload();
     }
 
@@ -261,10 +272,10 @@ var Engine = (function(global) {
     function drawGameStats(){
         
         // Create gameStats elements
-        gameStatsDiv = doc.createElement('div'),
-        livesUl = doc.createElement('ul'),
-        pointsDiv = doc.createElement('div'),
-        restartDiv = doc.createElement('div');
+        const gameStatsDiv = doc.createElement('div'),
+            livesUl = doc.createElement('ul'),
+            pointsDiv = doc.createElement('div'),
+            restartDiv = doc.createElement('div');
 
         // Set gameStats content and classes
         livesUl.classList.add('lives');
@@ -290,77 +301,104 @@ var Engine = (function(global) {
 
     }
 
+    // This function updates the timer every second
     function timer(){
-        seconds--;
-        if(seconds === -1 && minutes !== 0){
-            minutes--;
-            seconds = 59;
-        }
-            document.getElementById('minutes').innerHTML = minutes;
-        if(seconds < 10){
-            document.getElementById('seconds').innerHTML = '0' +seconds;
+        if(!timeIsPaused){
+            seconds--;
 
-        }else{
-            document.getElementById('seconds').innerHTML = seconds;
+            if(seconds === -1 && minutes !== 0){
+                minutes--;
+                seconds = 59;
+            }
 
-        }
-        if(minutes === 0 && seconds === 0){
-            clearInterval(timeInterval);
-            player.isGameOver = true;
-        }
+            minutesDisplay.innerHTML = minutes;
+            // doc.getElementById('minutes').innerHTML = minutes;
+            if(seconds < 10){
+                // document.getElementById('seconds').innerHTML = '0' +seconds;
+                secondsDisplay.innerHTML = '0' + seconds;
+            }else{
+                // document.getElementById('seconds').innerHTML = seconds;
+                secondsDisplay.innerHTML = seconds;
+            }
 
+            // If minutes and seconds both reach 0, the time is up
+            if(minutes === 0 && seconds === 0){
+                clearInterval(timeInterval);
+                // player is GAME OVER
+                player.isGameOver = true;
+            }
+        }
     }
 
+    // This function updates the player's points and displayes them in the gameStats
     function updatePoints(){
         if(currentGem.value !== 0){
-            pointsDiv.innerHTML = player.points;
+            doc.querySelector('.points').innerHTML = player.points;
         }else if(player.lives !== 3){
+            // if the player has less than 3 lives, updated lives
             player.updateLives(1);
             updateHearts(1);
         }
 
         gemOnBoard = false;
-        
     }
 
+    // This function updates the heart icons displayed in the gameStats
     function updateHearts(life){
         if(life === -1){
-            document.querySelector('.lives').children[0].remove();
+            // remove heart
+            doc.querySelector('.lives').children[0].remove();
         }else{
-            let hearts = document.querySelector('.lives');
-            let heart = document.createElement('li');
+            // add heart
+            let hearts = doc.querySelector('.lives'),
+                heart = doc.createElement('li');
             heart.innerHTML = '<i class="fas fa-heart"></i>';
             hearts.appendChild(heart);
         }
     }
 
+    // This function displayes the modal with winning or game over message
     function showModal(){
         clearInterval(timeInterval);
         let message = '';
+
         if(player.hasWon){
             message = `
                 <p>Congratulations!!!</p> 
                 <p>You completed the game before the time ran out!</p>
                 <p>Total points: ${player.points}`;
+        }else if(player.lives === 0){
+            message = `
+            <p>GAME OVER</p> 
+            <p>You ran out of lives...</p>
+            <p>But don't fret, you can always try again!</p>`;
         }else{
             message = `
             <p>GAME OVER</p> 
-            <p>Sorry, you lost :-(</p>`;
+            <p>Oops, no more time left...</p>
+            <p>Next time you better be quciker!</p>`;
         }
 
-
-        document.getElementById('modalMessage').innerHTML = message;
+        doc.getElementById('modalMessage').innerHTML = message;
 
         modal.style.display = "block";
         isModalVisible = true;
     }
 
+    // This function displayes the modal with game instructions
     function showInfoModal(){
+        // Pause timer
+        timeIsPaused = true;
         let message = `
         <p>GAME INSTRUCTIONS</p> 
-        <p>Game instructions will be displayed here</p>`;
+        <p>Collect as many gems as you can to earn points</p>
+        <p>But be careful, the ladybugs are not friendly. They will hurt you.</p>
+        <p>Make sure you get to the star before the time runs out...</p>
+        <p>Also, watch your lives, you certainly don't want to run out of those</p>
+        <p><em>...oh, and don't go in the water, you're not a very good swimmer...</em></p>
+        `;
 
-        document.getElementById('modalMessage').innerHTML = message;
+        doc.getElementById('modalMessage').innerHTML = message;
 
         modal.style.display = "block";
         isModalVisible = true;
