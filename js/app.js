@@ -236,7 +236,7 @@ let canvasWidth,
     enemy,
     gem;
 
-// Set game variables based on window height and width
+// Set game variables based on window height and width of the window
 if(window.innerWidth > 730){
     canvasWidth = 707;
     startX = 303;
