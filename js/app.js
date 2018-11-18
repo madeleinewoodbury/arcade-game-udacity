@@ -297,10 +297,16 @@ for(let i = 0; i < 50; i++){
 // Player.handleInput() method. 
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
+
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        65: 'left', // a
+        68: 'right', // d
+        83: 'down', // s
+        87: 'up' // w
+
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
