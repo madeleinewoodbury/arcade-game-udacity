@@ -17,6 +17,6 @@ The player can change it's avatar by moving to the selctor tile, or see the game
 ![alt text](images/screenshot.png "Screenshot of the game")
 
 ## Dependencies
-* [Font Awesome](https://fontawesome.com/?from=io) - Star icons and replay button
+* [Font Awesome](https://fontawesome.com/?from=io) - Heart icons and replay button
 * [Google Fonts](https://fonts.google.com/) - Font used
 
