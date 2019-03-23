@@ -1,0 +1,19 @@
+{
+  "name": "arcade-game",
+  "version": "1.0.0",
+  "description": "Classic-Arcade-Game-Clone =============================== This is a classic frogger-like arcade game where the goal is for the player to collect as many gems as possible and reach the star at the top before the timer runs out.",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madeleinewoodbury/arcade-game-udacity.git"
+  },
+  "author": "Madeleine Woodbury",
+  "license": "ISC",
+  "homepage": "https://madeleinewoodbury/arcade-game",
+  "dependencies": {
+    "gh-pages": "^2.0.1"
+  }
+}

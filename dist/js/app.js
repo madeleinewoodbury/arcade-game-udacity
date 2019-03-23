@@ -263,9 +263,9 @@ if(window.innerHeight > 760){
 
 // Instantiate the objects.
 const allEnemies = [],
-      gems = [],
-      player = new Player(startX, startY, 50, 3),
-      goal = new Goal();
+    gems = [],
+    player = new Player(startX, startY, 50, 3),
+    goal = new Goal();
 
 // Instantiate a new enemy for each yPos
 yPos.forEach(function(y){
