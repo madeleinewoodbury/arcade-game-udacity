@@ -12,7 +12,7 @@
   },
   "author": "Madeleine Woodbury",
   "license": "ISC",
-  "homepage": "https://madeleinewoodbury/arcade-game",
+  "homepage": "https://madeleinewoodbury/arcade-game-udacity",
   "dependencies": {
     "gh-pages": "^2.0.1"
   }
