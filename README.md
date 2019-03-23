@@ -4,7 +4,7 @@ This is a classic frogger-like arcade game where the goal is for the player to c
 
 ## Demo
 
-- [Click to play game](https://madeleinewoodbury/arcade-game-udacity)
+- [Click to play game](https://madeleinewoodbury.github.io/arcade-game-udacity/)
 
 ## How to Play
 
