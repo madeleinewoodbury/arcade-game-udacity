@@ -14,7 +14,7 @@ The player can change it's avatar by moving to the selctor tile, or see the game
 
 ## Screenshot of the game
 
-![alt text](images/screenshot.png "Screenshot of the game")
+![Screenshot of the game](dist/images/screenshot.png)
 
 ## Dependencies
 
